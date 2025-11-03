@@ -1,0 +1,36 @@
+/* Reset body and html for fullscreen map */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: system-ui, sans-serif;
+  background-color: #000;
+}
+
+/* Map container fills the screen */
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/* Hide MapLibre attribution button until hovered */
+.maplibregl-ctrl-bottom-right {
+  opacity: 0.3;
+  transition: opacity 0.3s;
+}
+
+.maplibregl-ctrl-bottom-right:hover {
+  opacity: 1;
+}
+
+/* Navigation control styling (compass, zoom buttons) */
+.maplibregl-ctrl-top-right {
+  margin: 10px;
+}
