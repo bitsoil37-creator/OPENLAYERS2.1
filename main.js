@@ -135,12 +135,15 @@ function updateMap(data) {
 
     if (markers[nodeName]) markers[nodeName].remove();
 
-    // If no packets, marker is grey
     const markerColor = latestPacket ? "red" : "grey";
 
     const marker = new maplibregl.Marker({ color: markerColor })
       .setLngLat([coords.X, coords.Y])
       .addTo(map);
+
+    /* ------------- THE CHANGE YOU REQUESTED -------------- */
+    marker.getElement().style.pointerEvents = "none"; // ← NO CLICK, NO TAP
+    /* ------------------------------------------------------ */
 
     const container = document.createElement("div");
     container.className = "popup-content";
@@ -152,13 +155,11 @@ function updateMap(data) {
     container.appendChild(title);
 
     if (!latestPacket) {
-      // No data yet
       const noData = document.createElement("p");
       noData.textContent = "No data available yet.";
       noData.style.textAlign = "center";
       container.appendChild(noData);
     } else {
-      // Existing code for parameters and bars
       params.forEach((param, i) => {
         const row = document.createElement("div");
         row.className = `param-row ${i >= 4 ? "extra hidden" : ""}`;
@@ -203,7 +204,6 @@ function updateMap(data) {
         info.style.opacity = shouldDisable ? "0.3" : "1.0";
         info.style.cursor = shouldDisable ? "not-allowed" : "pointer";
 
-        // Keep original advisory logic, no changes here
         info.onclick = () => {
           if (info.disabled) return;
 
@@ -276,7 +276,6 @@ function updateMap(data) {
       });
     }
 
-    // Toggle button
     const toggleBtn = document.createElement("button");
     toggleBtn.className = "toggle-btn";
     toggleBtn.textContent = "⬇️";
@@ -295,19 +294,17 @@ function updateMap(data) {
       anchor: "left",
     }).setDOMContent(container);
 
-    marker.setPopup(popup);
-    markers[nodeName] = marker;
+    /* ------------- THE CHANGE YOU REQUESTED -------------- */
+    // marker.setPopup(popup);  // ← REMOVED SO MARKER CANNOT OPEN POPUPS
+    /* ------------------------------------------------------ */
 
-    // ← Removed marker click listener to disable popup opening
-    // marker.getElement().addEventListener("click", ...);
+    markers[nodeName] = marker;
 
     popup.on("close", () => {
       document.getElementById("global-advisory").style.display = "none";
     });
   });
 
-  // Zoom to first node
-  // --- Zoom to the country with the most nodes ---
   if (coordsList.length > 0) {
     const geocodePromises = coordsList.map(([lng, lat]) =>
       fetch(`https://api.maptiler.com/geocoding/${lng},${lat}.json?key=k0zBlTOs7WrHcJIfCohH`)
@@ -327,13 +324,11 @@ function updateMap(data) {
         const country = countryFeature.properties.name;
         countryCount[country] = (countryCount[country] || 0) + 1;
 
-        // Store bbox for the country if we haven't yet
         if (!countryBboxes[country] && countryFeature.bbox) {
           countryBboxes[country] = countryFeature.bbox;
         }
       });
 
-      // Find country with most nodes
       const maxCountry = Object.entries(countryCount).reduce((a, b) => (b[1] > a[1] ? b : a), ["", 0])[0];
       const bbox = countryBboxes[maxCountry];
 
