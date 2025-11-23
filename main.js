@@ -1,6 +1,20 @@
 /* Initialize MapLibre + Firebase realtime updates */
 maplibregl.accessToken = 'none';
 
+/* === SAFETY: disable all MapLibre popups from being added/displayed ===
+   This overrides Popup.addTo so any code that tries to show a popup
+   (marker.setPopup(popup).addTo(map) or popup.addTo(map)) becomes a no-op.
+   That guarantees ZERO MapLibre popup UI ever appears.
+   (We keep your popup DOM creation intact for your positioning/advisory logic,
+   but MapLibre will never attach/display it.)
+*/
+if (maplibregl && maplibregl.Popup && maplibregl.Popup.prototype) {
+  maplibregl.Popup.prototype.addTo = function() {
+    // no-op: prevent any popup from being added to the map
+    return this;
+  };
+}
+
 /* Firebase */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
@@ -107,8 +121,24 @@ map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-
 let markers = {};
 let suppressUpdate = false;
 
+/* --- Extra safety: remove any existing popup DOM when page loads --- */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.maplibregl-popup').forEach(p => p.remove());
+});
+
+/* --- Extra safety: remove any popup DOM on map click (in case something created one) --- */
+map.on('click', () => {
+  document.querySelectorAll('.maplibregl-popup').forEach(p => p.remove());
+  // also hide global advisory to be safe (your advisory is separate)
+  const ga = document.getElementById('global-advisory');
+  if (ga) ga.style.display = 'none';
+});
+
 /* --- Firebase Realtime Updates --- */
 map.on("load", () => {
+  // extra cleanup at load
+  document.querySelectorAll('.maplibregl-popup').forEach(p => p.remove());
+
   const userRef = ref(db, `Users/${username}/Farm/Nodes`);
   onValue(userRef, (snapshot) => {
     if (suppressUpdate) return;
@@ -135,6 +165,7 @@ function updateMap(data) {
 
     if (markers[nodeName]) markers[nodeName].remove();
 
+    // If no packets, marker is grey
     const markerColor = latestPacket ? "red" : "grey";
 
     const marker = new maplibregl.Marker({ color: markerColor })
@@ -142,7 +173,9 @@ function updateMap(data) {
       .addTo(map);
 
     /* ------------- THE CHANGE YOU REQUESTED -------------- */
-    marker.getElement().style.pointerEvents = "none"; // ← NO CLICK, NO TAP
+    // Ensure marker cannot be clicked/tapped
+    const el = marker.getElement();
+    if (el) el.style.pointerEvents = "none";
     /* ------------------------------------------------------ */
 
     const container = document.createElement("div");
@@ -301,7 +334,8 @@ function updateMap(data) {
     markers[nodeName] = marker;
 
     popup.on("close", () => {
-      document.getElementById("global-advisory").style.display = "none";
+      const ga = document.getElementById("global-advisory");
+      if (ga) ga.style.display = "none";
     });
   });
 
