@@ -7,7 +7,7 @@ import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11
 
 /* --- Firebase Config --- */
 const firebaseConfig = {
-  databaseURL: "https://yurmam-40325-default-rtdb.firebaseio.com/"
+  databaseURL: "https://soilbitchina-default-rtdb.firebaseio.com/"
 };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -133,3 +133,4 @@ function updateMap(data) {
     });
   }
 }
+
