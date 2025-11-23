@@ -3,23 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Farm Map Viewer</title>
-
-  <!-- MapLibre CSS -->
-  <link
-    href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"
-    rel="stylesheet"
-  />
-  <!-- Custom Style -->
+  <title>Realtime Farm Monitor</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
 </head>
 <body>
-  <!-- Map Container -->
+  
+  <!-- ==============================
+       Top white banner with logo
+  ============================== -->
+  <div id="map-header">
+    <img src="logo.png" alt="Farm Logo">
+  </div>
+
+  <!-- Map container -->
   <div id="map"></div>
 
-  <!-- MapLibre JS -->
-  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-  <!-- Main JS -->
+  <!-- Floating advisory popup -->
+  <div id="global-advisory"></div>
+
+  <!-- Lock / Unlock draggable button -->
+  <button id="lockBtn" class="locked">🔒</button>
+
+  <!-- Firebase SDK + main script -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
