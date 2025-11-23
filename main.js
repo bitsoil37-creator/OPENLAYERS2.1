@@ -116,7 +116,6 @@ const map = new maplibregl.Map({
   pitch: 0
 });
 
-map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
 
 let markers = {};
 let suppressUpdate = false;
@@ -378,3 +377,4 @@ function updateMap(data) {
     });
   }
 }
+
